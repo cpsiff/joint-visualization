@@ -1,10 +1,9 @@
-import matplotlib.pyplot as plot
+import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.animation as animation
-from pylab import *
 import csv
 
-SOURCE_FILE = "joint-2019-06-10-14-38-30-486.csv"
+SOURCE_FILE = "data/joint-2019-06-10-14-38-30-486.csv"
 NUM_FRAMES = 100000
 NUM_JOINTS = 19
 FRAME_TIME = 133
