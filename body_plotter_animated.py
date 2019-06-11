@@ -3,8 +3,9 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.animation as animation
 import csv
 
-SOURCE_FILE = "data/joint-2019-06-10-14-38-30-486.csv"
+# if NUM_FRAMES is longer than file, whole file will be read
 NUM_FRAMES = 100000
+SOURCE_FILE = "data/joint-2019-06-10-14-38-30-486.csv"
 NUM_JOINTS = 19
 FRAME_TIME = 133
 
