@@ -85,7 +85,7 @@ z_midpoint = (min(joint_z) + max(joint_z)) / 2
 
 # animate function is scheduled once per FRAME_TIME
 def animate(i):
-    i = i%frames # so that animation loops
+    i = i%cur_frame # so that animation loops
     ax.clear() # clear previous frame's data
     ax.set_xlim3d(x_midpoint-maxrange/2, x_midpoint+maxrange/2)
     ax.set_ylim3d(z_midpoint-maxrange/2, z_midpoint+maxrange/2)
