@@ -30,22 +30,23 @@ frames = min(NUM_FRAMES, len(inp))
 # initialize dictionary to store joint data from csv
 data = {}
 
+# get list of bodies that appear in csv, set comprehension eliminates duplicates
 bodies = list({int(inp[i][1]) for i in range(frames)})
 
-print(bodies)
-
+# initialize dictionaries for storing body data
 for body in bodies:
     data[body] = {}
     for joint in joints:
         data[body][joint] = {}
-        data[body][joint]['x'] = dict()
-        data[body][joint]['y'] = dict()
-        data[body][joint]['z'] = dict()
+        data[body][joint]['x'] = {}
+        data[body][joint]['y'] = {}
+        data[body][joint]['z'] = {}
 
+# iterate through csv, placing data in 'data' dict
+# data is only stored in data[cur_body][joint][x/y/z][i] if the body appears in the ith frame
 cur_frame = 1
 line = 0
 while line < len(inp):
-    print(line)
     if line > 1:
         if (inp[line][0] != inp[line-1][0]):
             cur_frame += 1
@@ -90,19 +91,15 @@ def animate(i):
     ax.set_ylim3d(z_midpoint-maxrange/2, z_midpoint+maxrange/2)
     ax.set_zlim3d(y_midpoint-maxrange/2, y_midpoint+maxrange/2)
 
-    # scatter plot joints
+    # scatter plot joints (commented out) and line plot bones
     for body in bodies:
-        print(body)
-        for joint in joints:
-            if i in data[body][joint]['x']:
-                ax.scatter(data[body][joint]['x'][i], data[body][joint]['z'][i], data[body][joint]['y'][i])
-
-    # line plot bones connecting joints
-    for body in bodies:
-        for bone in bones:
-            plt.plot([data[body][bone[0]]['x'][i],data[body][bone[1]]['x'][i]],
-                    [data[body][bone[0]]['z'][i],data[body][bone[1]]['z'][i]],
-                    [data[body][bone[0]]['y'][i],data[body][bone[1]]['y'][i]])
+        if i in data[body]['head']['x']:
+            # for joint in joints:
+            #     ax.scatter(data[body][joint]['x'][i], data[body][joint]['z'][i], data[body][joint]['y'][i])
+            for bone in bones:
+                plt.plot([data[body][bone[0]]['x'][i],data[body][bone[1]]['x'][i]],
+                        [data[body][bone[0]]['z'][i],data[body][bone[1]]['z'][i]],
+                        [data[body][bone[0]]['y'][i],data[body][bone[1]]['y'][i]])
 
 # schedule animation function
 ani = animation.FuncAnimation(fig, animate, interval=FRAME_TIME)
