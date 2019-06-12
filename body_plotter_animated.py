@@ -5,8 +5,7 @@ import csv
 
 # if NUM_FRAMES is longer than file, whole file will be read
 NUM_FRAMES = 100000
-SOURCE_FILE = "data/joint-2019-06-10-14-38-30-486.csv"
-NUM_JOINTS = 19
+SOURCE_FILE = "data/three-people.csv"
 FRAME_TIME = 133
 
 joints = ["head","shoulderspine","leftshoulder","leftelbow","lefthand",
@@ -31,12 +30,32 @@ frames = min(NUM_FRAMES, len(inp))
 # initialize dictionary to store joint data from csv
 data = {}
 
-# add csv data to 'data' dict
-for joint in joints:
-    data[joint] = {}
-    data[joint]['x'] = [float(x) for x in [inp[i][3*joints.index(joint)+2] for i in range(frames)]]
-    data[joint]['y'] = [float(x) for x in [inp[i][3*joints.index(joint)+3] for i in range(frames)]]
-    data[joint]['z'] = [float(x) for x in [inp[i][3*joints.index(joint)+4] for i in range(frames)]]
+# get list of bodies that appear in csv, set comprehension eliminates duplicates
+bodies = list({int(inp[i][1]) for i in range(frames)})
+
+# initialize dictionaries for storing body data
+for body in bodies:
+    data[body] = {}
+    for joint in joints:
+        data[body][joint] = {}
+        data[body][joint]['x'] = {}
+        data[body][joint]['y'] = {}
+        data[body][joint]['z'] = {}
+
+# iterate through csv, placing data in 'data' dict
+# data is only stored in data[cur_body][joint][x/y/z][i] if the body appears in the ith frame
+cur_frame = 1
+line = 0
+while line < len(inp):
+    if line > 1:
+        if (inp[line][0] != inp[line-1][0]):
+            cur_frame += 1
+    cur_body = int(inp[line][1])
+    for joint in joints:
+        data[cur_body][joint]['x'][cur_frame] = float(inp[line][3*joints.index(joint)+2])
+        data[cur_body][joint]['y'][cur_frame] = float(inp[line][3*joints.index(joint)+3])
+        data[cur_body][joint]['z'][cur_frame] = float(inp[line][3*joints.index(joint)+4])
+    line += 1
 
 # initialize plot and figure
 fig = plt.figure()
@@ -52,9 +71,10 @@ joint_x = []
 joint_y = []
 joint_z = []
 for joint in joints:
-    joint_x += data[joint]['x']
-    joint_y += data[joint]['y']
-    joint_z += data[joint]['z']
+    for body in bodies:
+        joint_x += data[body][joint]['x'].values()
+        joint_y += data[body][joint]['y'].values()
+        joint_z += data[body][joint]['z'].values()
 
 # find the max min and midpoints of data in each direction to neatly fit screen
 maxrange = int(max(max(joint_x)-min(joint_x),max(joint_y)
@@ -71,15 +91,15 @@ def animate(i):
     ax.set_ylim3d(z_midpoint-maxrange/2, z_midpoint+maxrange/2)
     ax.set_zlim3d(y_midpoint-maxrange/2, y_midpoint+maxrange/2)
 
-    # scatter plot joints
-    for joint in joints:
-        ax.scatter(data[joint]['x'][i], data[joint]['z'][i], data[joint]['y'][i])
-
-    # line plot bones connecting joints
-    for bone in bones:
-        plt.plot([data[bone[0]]['x'][i],data[bone[1]]['x'][i]],
-                [data[bone[0]]['z'][i],data[bone[1]]['z'][i]],
-                [data[bone[0]]['y'][i],data[bone[1]]['y'][i]])
+    # scatter plot joints (commented out) and line plot bones
+    for body in bodies:
+        if i in data[body]['head']['x']:
+            # for joint in joints:
+            #     ax.scatter(data[body][joint]['x'][i], data[body][joint]['z'][i], data[body][joint]['y'][i])
+            for bone in bones:
+                plt.plot([data[body][bone[0]]['x'][i],data[body][bone[1]]['x'][i]],
+                        [data[body][bone[0]]['z'][i],data[body][bone[1]]['z'][i]],
+                        [data[body][bone[0]]['y'][i],data[body][bone[1]]['y'][i]])
 
 # schedule animation function
 ani = animation.FuncAnimation(fig, animate, interval=FRAME_TIME)
