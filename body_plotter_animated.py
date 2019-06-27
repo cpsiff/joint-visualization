@@ -5,7 +5,7 @@ import csv
 
 # if NUM_FRAMES is longer than file, whole file will be read
 NUM_FRAMES = 100000
-SOURCE_FILE = "data/three-people.csv"
+SOURCE_FILE = "data/matching_gif.csv"
 FRAME_TIME = 133
 
 joints = ["head","shoulderspine","leftshoulder","leftelbow","lefthand",
