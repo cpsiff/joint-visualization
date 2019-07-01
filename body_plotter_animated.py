@@ -5,7 +5,7 @@ import csv
 
 # if NUM_FRAMES is longer than file, whole file will be read
 NUM_FRAMES = 100000
-SOURCE_FILE = "data/matching_gif.csv"
+SOURCE_FILE = 'data/capture/joint-2019-06-17-17-40-00-001.csv'
 FRAME_TIME = 133
 
 joints = ["head","shoulderspine","leftshoulder","leftelbow","lefthand",
@@ -22,6 +22,13 @@ bones = [["head","shoulderspine"],["shoulderspine","neck"],["neck","midspine"],
         ["righthip","rightknee"],["rightknee","rightfoot"],
         ["basespine","lefthip" ],["lefthip", "leftknee" ],
         ["leftknee", "leftfoot" ]]
+
+# bones = [["shoulderspine","rightshoulder"],
+#         ["rightshoulder","rightelbow"],["rightelbow","rightwrist"],
+#         ["rightwrist","righthand"],["shoulderspine","leftshoulder" ],
+#         ["leftshoulder", "leftelbow" ],["leftelbow", "leftwrist" ],
+#         ["leftwrist", "lefthand" ],["head","shoulderspine"],["shoulderspine","neck"],["neck","midspine"]]
+
 
 inp = list(csv.reader(open(SOURCE_FILE)))
 
@@ -85,7 +92,6 @@ z_midpoint = (min(joint_z) + max(joint_z)) / 2
 
 # animate function is scheduled once per FRAME_TIME
 def animate(i):
-    i = i%cur_frame # so that animation loops
     ax.clear() # clear previous frame's data
     ax.set_xlim3d(x_midpoint-maxrange/2, x_midpoint+maxrange/2)
     ax.set_ylim3d(z_midpoint-maxrange/2, z_midpoint+maxrange/2)
@@ -102,6 +108,9 @@ def animate(i):
                         [data[body][bone[0]]['y'][i],data[body][bone[1]]['y'][i]])
 
 # schedule animation function
-ani = animation.FuncAnimation(fig, animate, interval=FRAME_TIME)
+ani = animation.FuncAnimation(fig, animate, frames=cur_frame, interval=FRAME_TIME)
+plt.subplots_adjust(right=1.0, left=0.0,top=1.0, bottom=0.0)
+
+ani.save(SOURCE_FILE.split('/')[-1] + '.gif', writer='imagemagick', fps=7)
 
 plt.show()
